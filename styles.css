@@ -1,0 +1,129 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+body{
+  background: linear-gradient(90deg, #b6fbff, #83a4d4);
+}
+
+div.MainWrapper {
+  width: 100%;
+  height: 97vh;
+  /* padding-top: 20px; */
+  margin-top: 20px;
+  display: flex;
+}
+
+div.TabsContainer {
+  width: 120px;
+  height: 100%;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(90deg, rgba(255, 239, 186, 1) 50%, rgba(156,252,248,1) 100%);
+}
+
+div.Tab {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 50px;
+  padding: 5px;
+  border-bottom: 1px solid black;
+  background-color: rgba(192,192,192, 0.6);
+}
+
+div.SelectedTabContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+div.SelectionContainer{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  padding-top: 50px;
+}
+
+/* ------------------------------------------ PLAYER SELECTION MENU ------------------------------------------*/
+
+div#PlayerSelectionContainer{
+  height: 45vh;
+  padding: 0px 15px 0px 25px;
+}
+
+div.PlayerSelector{
+  height: 100%;
+  width: 45%;
+  border: 1px solid black;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 30px;
+}
+
+/* ------------------------------------------ THEME SELECTION MENU ------------------------------------------*/
+
+
+div#ThemeSelectionContainer{
+  height: 60vh;
+  padding: 0px 15px 0px 25px;
+  /* padding-top: 50px; */
+  align-items: center;
+}
+
+div.ThemeSelector{
+  height: 30vh;
+  width: 30%;
+  border: 1px solid black;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 30px;
+}
+
+/* ------------------------------------------ ANSWER SELECTION MENU ------------------------------------------*/
+
+
+div#AnswerSelectionContainer{
+  height: 89vh;
+  padding: 0px 15px 0px 25px;
+  align-items: center;
+  position:relative;
+}
+
+div#Clock{
+  position:absolute;
+  top:46.5%;
+  right: 46%;
+  font-size: 20px;
+}
+
+span#clockPlayerSpan{
+  color: red;
+}
+
+div.AnswerSelector{
+  height: 45%;
+  width: 45%;
+  border: 1px solid black;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 30px;
+}
+
+div#QuestionContainer{
+  width: 100%;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
