@@ -94,31 +94,90 @@ var Quiz_ns = Quiz_ns || {
     beginGame: async function(){
         this.currentGameQuestions = this.allQuestionsData[this.gameTheme];
         this.initStats();
+        this.prepareQuestions();
         this.questionContainer = document.getElementById('QuestionContainer')
         this.answerSelectors = document.getElementsByClassName('AnswerSelector')
         this.secondsSpan = document.getElementById('clockSecondsSpan');
-        // console.log(this.currentGameQuestions);
-        // console.log(this.questionContainer);
-        // for (let i = 0; i < this.answerSelectors.length; i++){
-        //     this.answerSelectors[i].addEventListener('click', () =>{
 
-        //         var chosenAnswer = this.answerSelectors[i].innerText;
+        this.currentPlayer = 1;
+        this.currentRound = 1;
+        this.questionContainer.innerText = this.currentQuestion.Question;
+        this.setAnswers(this.currentRound);
+        var playerSpan = document.getElementById('clockPlayerSpan');
+        playerSpan.innerText = `Player${this.currentPlayer}`;
+        playerSpan.style.color = this.gameData[`Player${this.currentPlayer}`].Color;
 
-        //         if (chosenAnswer === this.currentQuestion.CorrectAnswer){
-        //             this.gameData[`Player${this.currentPlayer}`].Score += 10;
-        //         }
 
-        //         this.gameData[`Player${this.currentPlayer}`].ChosenAnswers.push(chosenAnswer);
-        //         this.currentPlayer++;
-        //         this.hasSelected = true;
-        //     })
-        // }
+        for (let i = 0; i < this.answerSelectors.length; i++){
+            this.answerSelectors[i].addEventListener('click', () =>{
+                var chosenAnswer = this.answerSelectors[i].innerText;
 
-        for (let i = 1; i <= 10; i++){
+                console.log(`${chosenAnswer} <- chosen`);
+                console.log(this.currentQuestion)
+                console.log(this.currentQuestion.CorrectAnswer)
+                if (chosenAnswer === this.currentQuestion.CorrectAnswer){
+                    this.gameData[`Player${this.currentPlayer}`].Score += 10;
+                }
 
-            await this.playRound(i);
+                this.gameData[`Player${this.currentPlayer}`].ChosenAnswers.push(chosenAnswer);
+
+                if (this.answerSelectors[i].style.borderColor === "black"){
+                    this.answerSelectors[i].style.borderColor = this.gameData[`Player${this.currentPlayer}`].Color;
+                }
+                else{
+                    this.answerSelectors[i].style.borderColor += ` ${this.gameData[`Player${this.currentPlayer}`].Color}`;
+                }
+
+                this.currentPlayer++;
+
+                if (this.currentPlayer < this.playerCount){
+                    playerSpan.innerText = `Player${this.currentPlayer}`;
+                    playerSpan.style.color = this.gameData[`Player${this.currentPlayer}`].Color;
+                }
+
+                if (this.currentPlayer > this.playerCount){
+                    this.currentRound++;
+                    this.resetAnswerBorders();
+                    this.currentPlayer = 1;
+                    playerSpan.innerText = `Player${this.currentPlayer}`;
+                    playerSpan.style.color = this.gameData[`Player${this.currentPlayer}`].Color;
+                    if (this.currentRound !== 11){
+                        this.setAnswers(this.currentRound);
+                        this.questionContainer.innerText = this.chosenQuestions[this.currentRound - 1].Question;
+                        this.currentQuestion = this.chosenQuestions[this.currentRound - 1]
+                    }
+                }
+
+                if (this.currentRound === 11){
+                    this.endGame();
+                }
+            })
         }
-        console.log(this.gameData);
+    },
+
+    resetAnswerBorders: function(){
+
+        for (let i = 0; i < this.answerSelectors.length; i++){
+            this.answerSelectors[i].style.borderColor = "black";
+        }
+    },
+
+    setAnswers: function(roundNum){
+        let roundAnswers = this.chosenQuestions[roundNum - 1].Answers
+        for (let i = 0; i < this.answerSelectors.length; i++){
+            this.answerSelectors[i].innerText = roundAnswers[i];
+        }
+    },
+
+    prepareQuestions: function(){
+        for (let i = 0; i < 10; i++){
+            let randomIndex = Math.floor(Math.random() * this.currentGameQuestions.length);
+            let randomElement = this.currentGameQuestions.splice(randomIndex, 1)[0];
+            // this.currentQuestion = randomElement;
+            this.chosenQuestions.push(randomElement);
+        }
+        this.currentQuestion = this.chosenQuestions[0]
+        console.log(this.chosenQuestions)
     },
 
     // ! STORE ALL QUESTIONS CHOSEN IN AN ARRAY, NEED TO STORE WHICH PLAYER ANSWERED WHAT TO EACH QUESTION
@@ -138,52 +197,82 @@ var Quiz_ns = Quiz_ns || {
         return newPlayer;
     },
 
-    playRound: async function(roundNum){
-        let randomIndex = Math.floor(Math.random() * this.currentGameQuestions.length);
-        let randomElement = this.currentGameQuestions.splice(randomIndex, 1)[0];
-        this.questionContainer.innerText = randomElement.Question;
-        this.currentQuestion = randomElement;
-        this.chosenQuestions.push(randomElement);
-        // var playerSpan = document.getElementById('clockPlayerSpan');
+    endGame: function(){
 
-        for (let j = 0; j < 4; j++){
-            this.answerSelectors.innerText = this.currentQuestion.Answers[j] 
-        }
+        this.resultTable = document.createElement('table');
+        this.resultTable.appendChild(this.createHeaderRow())
 
-        this.isRoundPlaying = true;
-        this.currentRound = roundNum;
-        for (let i = 0; i < this.playerCount; i++){
-            this.currentPlayer = i + 1;
-            await this.playerPick(i + 1);
-            console.log(i)
+        for (let i = 0; i < 10; i++){
+            this.resultTable.appendChild(this.createResultRow(i))
         }
-        this.isRoundPlaying = false;
-        this.currentRound++;
-        console.log(this.gameData)
+        document.getElementsByClassName('SelectedTabContainer')[0].style.display = 'none'
+        
+        var mainWrapper = document.getElementsByClassName('MainWrapper')[0];
+        mainWrapper.appendChild(this.resultTable);
+        mainWrapper.appendChild(this.createScoreTable());
     },
 
-    playerPick: async function(playerNum){
-        const promises = Array.from(Quiz_ns.answerSelectors).map(Quiz_ns.createPromise);
-
-        Promise.race(promises).then((answerDiv) => Quiz_ns.handlePlayerChoice(playerNum, answerDiv))
-    },
-
-    handlePlayerChoice: function(playerNumber, answerDiv){
-        var chosenAnswer = answerDiv.innerText;
-        console.log('a')
-        if (chosenAnswer === Quiz_ns.currentQuestion.CorrectAnswer){
-            Quiz_ns.gameData[`Player${playerNumber}`].Score += 10;
+    createResultRow: function(index){
+        
+        let row = document.createElement('tr')
+        let question = this.chosenQuestions[index]
+        row.appendChild(this.createTableCell(question.Question, "td"))
+        row.appendChild(this.createTableCell(question.CorrectAnswer, "td"))
+        for (let i = 1; i <= this.playerCount; i++){
+            row.appendChild(this.createTableCell( this.gameData[`Player${i}`].ChosenAnswers[index], "th"))
         }
-
-        Quiz_ns.gameData[`Player${playerNumber}`].ChosenAnswers.push(chosenAnswer);
+        return row;
     },
 
-    createPromise: function(element){
-        return new Promise((resolve) => {
-            element.addEventListener('click', () =>{
-                resolve(element)
-            })
+    createScoreTable: function(){
+        let table = document.createElement('table');
+        
+        let headerRow = document.createElement('tr');
+        headerRow.appendChild(this.createTableCell("Player", "th"))
+        headerRow.appendChild(this.createTableCell("Score", "th"))
+
+        table.appendChild(headerRow);
+        
+        let players = [];
+
+        for (let i = 1; i <= this.playerCount; i++){
+            // headerRow.appendChild(this.createTableCell(`Player${i}`, "th"))
+            players.push(this.gameData[`Player${i}`])
+        }
+        
+        players.sort((a,b) =>{
+            return b.Score - a.Score
         })
+
+        for (let i = 0; i < players.length; i++){
+            let row = document.createElement('tr');
+
+            row.appendChild(this.createTableCell(`Player${i + 1}`, "td"))
+            row.appendChild(this.createTableCell(`${players[i].Score}`, "td"))
+
+            table.appendChild(row)
+        }
+
+        return table;
+    },
+
+    createHeaderRow: function(){
+        let headerRow = document.createElement('tr');
+        headerRow.appendChild(this.createTableCell("Question", "th"))
+        headerRow.appendChild(this.createTableCell("CorrectAnswer", "th"))
+
+        for (let i = 1; i <= this.playerCount; i++){
+            headerRow.appendChild(this.createTableCell(`Player${i}`, "th"))
+        }
+
+        return headerRow;
+    },
+
+    createTableCell: function(text, cellType){
+        var cell = document.createElement(cellType);
+        cell.textContent = text;
+
+        return cell;
     },
 
     init: async function(){

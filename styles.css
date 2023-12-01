@@ -67,6 +67,19 @@ div.PlayerSelector{
   font-size: 30px;
 }
 
+div.PlayerSelector#one{
+  background-color: rgba(198, 0, 0, 0.5);
+}
+div.PlayerSelector#two{
+  background: linear-gradient(300deg, rgba(121,9,9,1) 35%, rgba(0,52,255,1) 100%);
+}
+
+div.PlayerSelector#three{
+  background: linear-gradient(300deg, rgba(121,9,9,1) 0%, rgba(0,52,255,1) 50%, rgba(69,252,70,1) 100%);
+}
+div.PlayerSelector#four{
+  background: linear-gradient(300deg, rgba(121,9,9,1) 0%, rgba(0,52,255,1) 30%, rgba(69,252,70,1) 60%, rgb(253, 187, 45 ,1) 100%);
+}
 /* ------------------------------------------ THEME SELECTION MENU ------------------------------------------*/
 
 
@@ -105,8 +118,8 @@ div#Clock{
   font-size: 20px;
 }
 
-span#clockPlayerSpan{
-  color: red;
+th, td{
+  border: 1px solid black;
 }
 
 div.AnswerSelector{
